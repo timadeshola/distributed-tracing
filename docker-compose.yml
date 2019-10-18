@@ -1,0 +1,97 @@
+version: '3.7'
+services:
+  elasticsearch:
+    image: elasticsearch:7.2.0
+    container_name: myelasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    ports:
+      - "9200:9200"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - custom-vol:/elasticsearch/data
+    network_mode: host
+    extra_hosts:
+      - localhost:127.0.0.1
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.2.0
+    container_name: mykibana
+    ports:
+      - "5601:5601"
+    expose:
+      - "5601"
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+    volumes:
+      - custom-vol:/kibana/data
+    depends_on:
+      - elasticsearch
+    network_mode: host
+    extra_hosts:
+      - localhost:127.0.0.1
+
+  zipkin-server:
+    image: zipkin-server
+    container_name: zipkin-server
+    ports:
+      - "9411:9411"
+    expose:
+      - "9411"
+    volumes:
+      - custom-vol:/zipkin
+    depends_on:
+      - kafka
+      - elasticsearch
+    network_mode: host
+    extra_hosts:
+      - localhost:127.0.0.1
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:5.3.0
+    container_name: zookeeper
+    ports:
+      - 2181:2181
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+    volumes:
+      - custom-vol:/tmp/zookeeper/data
+      - custom-vol:/tmp/zookeeper/datalog
+    network_mode: host
+    extra_hosts:
+      - localhost:127.0.0.1
+
+  kafka:
+    image: confluentinc/cp-kafka:5.3.0
+    container_name: kafka
+    ports:
+      - 9092:9092
+    expose:
+      - 9092
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: localhost:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 1000
+      CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
+    volumes:
+      - custom-vol:/tmp/kafka/data
+    network_mode: host
+    extra_hosts:
+      - localhost:127.0.0.1
+
+volumes:
+  custom-vol:
+    external: true

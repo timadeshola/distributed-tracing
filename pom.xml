@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.1.9.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>com.example.microservice</groupId>
+    <artifactId>distributed-tracing</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>distributed-tracing</name>
+    <description>Zipkin - Sleuth Distribution Tracing Application</description>
+
+    <modules>
+        <module>demo-gateway</module>
+        <module>demo-discovery-server</module>
+		<module>demo-account-app</module>
+        <module>demo-customer-app</module>
+		<module>zipkin-server</module>
+    </modules>
+
+</project>

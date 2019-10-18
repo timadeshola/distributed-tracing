@@ -1,0 +1,19 @@
+version: '3.7'
+services:
+  zipkin-server:
+    image: zipkin-server
+    container_name: zipkin-server
+    restart: unless-stopped
+    ports:
+      - "9411:9411"
+    expose:
+      - "9411"
+    network_mode: host
+    extra_hosts:
+      - localhost:127.0.0.1
+    volumes:
+      - custom-vol:/zipkin
+
+volumes:
+  custom-vol:
+    external: true
